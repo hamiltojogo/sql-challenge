@@ -1,0 +1,175 @@
+--create departments table
+
+drop table departments
+
+CREATE TABLE departments (
+    dept_no varchar NOT NULL primary key,
+    dept_name varchar   NOT NULL
+    
+);
+
+select * from departments
+
+drop table titles
+
+--create title table
+CREATE TABLE titles (
+    title_id varchar  NOT NULL primary key,
+    title varchar NOT NULL    
+);
+
+--alter table titles
+	--add column id serial primary key
+
+select * from titles
+
+
+--drop old employee tale 
+drop table employees
+
+--create employee table
+
+CREATE TABLE employees (
+    emp_no integer NOT NULL primary key,
+    emp_title varchar   NOT NULL,
+    birth_date date   NOT NULL,
+    first_name varchar   NOT NULL,
+    last_name varchar   NOT NULL,
+    sex varchar   NOT NULL,
+    hire_date date   NOT NULL,
+    FOREIGN KEY (emp_title) REFERENCES titles(title_id)
+);
+
+
+select * from employees
+
+-- drop dept_emp table if there is one
+drop table dept_emp
+
+--create dept_emp table
+create table dept_emp (
+	emp_no int not null,
+	dept_no varchar not null,
+	foreign key (emp_no) references employees (emp_no)
+);
+
+select * from dept_emp
+	
+
+--drop dept_manager table if there is one
+drop table dept_manager
+
+-- create dept_manager table
+create table dept_manager(
+	dept_no varchar not null,
+	emp_no int not null,
+	foreign key (emp_no) references employees (emp_no)
+);
+
+--drop table salaries if there is one
+drop table salary
+
+--create salaries table
+create table salary(
+	emp_no int not null,
+	salary int not null,
+	foreign key (emp_no) references employees (emp_no)
+);
+
+select * from salary
+
+
+-- List the following details of each employee: employee number, last name, first name, sex, and salary.
+select employees.emp_no,
+	employees.last_name,
+	employees.first_name,
+	employees.sex,
+	salary.salary
+from employees
+inner join salary on 
+employees.emp_no = salary.emp_no
+
+--List first name, last name, and hire date for employees who were hired in 1986
+select first_name,
+	last_name,
+	hire_date
+from employees
+where hire_date >= '1/1/1986'
+and hire_date <= '12/31/1986'
+
+
+--List the manager of each department with the following information: department number, department name, 
+--the manager's employee number, last name, first name
+select employees.last_name,
+	employees.first_name,
+	employees.emp_no,
+	dept_manager.dept_no,
+	departments.dept_name
+from departments
+join dept_manager
+on departments.dept_no = dept_manager.dept_no
+join employees
+on dept_manager.emp_no = employees.emp_no;
+
+--List the department of each employee with the following information: employee number, 
+--last name, first name, and department name
+
+select employees.last_name,
+	employees.first_name,
+	employees.emp_no,
+	departments.dept_name
+from departments
+join dept_emp
+on departments.dept_no = dept_emp.dept_no
+join employees
+on dept_emp.emp_no = employees.emp_no
+
+--List first name, last name, and sex for employees whose first name is "Hercules" and last names begin with "B."
+select last_name,
+	first_name, 
+	sex
+from employees
+where first_name = 'Hercules'
+and last_name like 'B%'
+
+--List all employees in the Sales department, including their employee number, last name, 
+--first name, and department name
+
+select * from departments
+
+select employees.emp_no,
+	employees.last_name,
+	employees.first_name,
+	departments.dept_name
+from departments
+join dept_emp
+on departments.dept_no = dept_emp.dept_no
+join employees
+on dept_emp.emp_no = employees.emp_no
+where departments.dept_no = 'd007'
+
+--List all employees in the Sales and Development departments, including their employee number, last name, 
+--first name, and department name
+
+select employees.emp_no,
+	employees.last_name,
+	employees.first_name,
+	departments.dept_name
+from departments
+join dept_emp
+on departments.dept_no = dept_emp.dept_no
+join employees
+on dept_emp.emp_no = employees.emp_no
+where departments.dept_no = 'd007'
+or departments.dept_no = 'd005'
+
+--descending order, list the frequency count of employee last names, 
+--i.e., how many employees share each last name
+
+select last_name, count(last_name) as frequency
+from employees
+group by last_name
+order by 
+count (last_name) desc
+
+
